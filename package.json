@@ -1,0 +1,31 @@
+{
+  "name": "raster-streamlines",
+  "version": "0.0.0",
+  "description": "Generates stramlines as SVG paths from a raster field",
+  "main": "build/raster-streamlines.js",
+  "jsnext:main": "index",
+  "scripts": {
+    "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -n spp -o build/raster-streamlines.js -- index.js",
+    "test": "tape 'test/*-test.js' && eslint index.js src",
+    "prepublish": "npm run test && uglifyjs --preamble \"$(preamble)\" build/raster-streamlines.js -c -m -o build/raster-streamlines.min.js",
+    "postpublish": "git push && git push --tags"
+  },
+  "keywords": [
+    "raster",
+    "streamlines",
+    "field"
+  ],
+  "author": {
+    "name": "Roger Veciana i Rovira",
+    "url": "https://geoexamples.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "canvas": "^1.6.2",
+    "eslint": "^3.10.0",
+    "package-preamble": "0.0.2",
+    "rollup": "^0.36.3",
+    "tape": "^4.6.2",
+    "uglify-js": "^2.7.4"
+  }
+}
