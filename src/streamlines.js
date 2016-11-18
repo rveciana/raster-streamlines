@@ -2,7 +2,7 @@ export var streamlines = function(uData, vData){
   var output = [];
   var inst = new Streamlines(uData, vData);
   output.push(inst.getLine(0, 0));
-
+  console.info("-----", inst.findEmptyPixel(3,3,1));
   return output;
 };
 
@@ -22,7 +22,48 @@ function Streamlines(uData, vData){
   }
 }
 
+Streamlines.prototype.findEmptyPixel = function(x0, y0, dist) {
+  //Explores around the init pixel creating squares to find an empty pixel
+  var pixel = this.isPixelFree(x0, y0, dist);
 
+  for(var d = 2; d <= 5; d=d+2){
+    if(pixel){break;}
+    for(var pd = 0; pd<d; pd++){
+      pixel = this.isPixelFree(pd+1+x0-d/2, y0-d/2, dist);
+      if(pixel){break;}
+      pixel = this.isPixelFree(x0-d/2, pd+y0-d/2, dist);
+      if(pixel){break;}
+      pixel = this.isPixelFree(d+x0-d/2, pd+1+y0-d/2, dist);
+      if(pixel){break;}
+      pixel = this.isPixelFree(pd+x0-d/2, d+y0-d/2, dist);
+    }
+
+  }
+
+  return pixel;
+};
+
+Streamlines.prototype.isPixelFree = function(x0, y0, dist) {
+  console.info(x0, y0, dist);
+  var result = false;
+  if(x0<0 || x0>=this.usedPixels[0].length || y0<0 || y0 >= this.usedPixels.length){
+    return result;
+  }
+
+  for(var i=-dist; i<=dist;i++){
+    if(result){break;}
+    for(var j=-dist; j<=dist;j++){
+      if(result){break;}
+      if(y0+j>=0 &&y0+j<this.usedPixels.length && x0+i>=0 && x0+i<this.usedPixels[y0].length){
+        if(this.usedPixels[y0+j][x0+i]){
+          result = {x: x0+i, y:y0+j};
+        }
+      }
+    }
+  }
+
+  return result;
+};
 
 Streamlines.prototype.getLine = function(x, y) {
   var outLine = [[x, y]];
@@ -33,6 +74,7 @@ Streamlines.prototype.getLine = function(x, y) {
     outLine.push([x, y]);
     this.usedPixels[Math.floor(y)][Math.floor(x)] = true;
   }
+  console.log(this.usedPixels);
   return outLine;
 };
 
