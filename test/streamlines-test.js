@@ -3,7 +3,6 @@ streamlines = require("../");
 
 tape("Testing the most simple streamlines", function(test) {
   var data = createSimpleMatrix(0.5, 1, 3, 3);
-  console.info(streamlines.streamlines(data.u, data.v));
   test.end();
 });
 
