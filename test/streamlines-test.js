@@ -2,7 +2,28 @@ var tape = require("tape"),
 streamlines = require("../");
 
 tape("Testing the most simple streamlines", function(test) {
-  var data = createSimpleMatrix(0.5, 1, 3, 3);
+  var data;
+
+  data = createSimpleMatrix(0, 1, 3, 3);
+  test.deepEqual(streamlines.streamlines(data.u, data.v),
+  [ [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ],
+  [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ] ]);
+
+  data = createSimpleMatrix(0, -1, 3, 3);
+  test.deepEqual(streamlines.streamlines(data.u, data.v),
+  [ [ [ 2, 2 ], [ 2, 1 ], [ 2, 0 ] ],
+  [ [ 0, 2 ], [ 0, 1 ], [ 0, 0 ] ] ]);
+
+  data = createSimpleMatrix(1, 0, 3, 3);
+  test.deepEqual(streamlines.streamlines(data.u, data.v),
+  [ [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ],
+  [ [ 0, 2 ], [ 1, 2 ], [ 2, 2 ] ] ]);
+
+  data = createSimpleMatrix(-1, 0, 3, 3);
+  test.deepEqual(streamlines.streamlines(data.u, data.v),
+  [ [ [ 2, 2 ], [ 1, 2 ], [ 0, 2 ] ],
+  [ [ 2, 0 ], [ 1, 0 ], [ 0, 0 ] ] ]);
+
   test.end();
 });
 

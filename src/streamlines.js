@@ -7,8 +7,7 @@ export var streamlines = function(uData, vData){
 
   var pos = 0;
   var x, y;
-  while(pixel && line){
-
+  while(pixel){
     if(pos%4 === 0){
       x = 0;
       y = 0;
@@ -55,7 +54,7 @@ Streamlines.prototype.findEmptyPixel = function(x0, y0, dist) {
     return {x:x0, y:y0};
   }
   var maxDist = Math.max.apply(Math, [x0, y0, Math.abs(x0 - this.uData[0].length), Math.abs(y0 - this.uData.length)]);
-  for(var d = 2; d <= maxDist; d=d+2){
+  for(var d = 2; d <= maxDist + 1; d=d+2){
     for(var pd = 0; pd<d; pd++){
       if(this.isPixelFree(pd+1+x0-d/2, y0-d/2, dist)){return {x:pd+1+x0-d/2, y:y0-d/2};}
       if(this.isPixelFree(x0-d/2, pd+y0-d/2, dist)){return {x:x0-d/2, y:pd+y0-d/2};}
@@ -84,19 +83,22 @@ Streamlines.prototype.isPixelFree = function(x0, y0, dist) {
   return true;
 };
 
-Streamlines.prototype.getLine = function(x, y) {
+Streamlines.prototype.getLine = function(x0, y0) {
   var lineFound = false;
+  var x = x0;
+  var y = y0;
   var outLine = [[x, y]];
-  while(x >= 0 && x < this.uData[0].length - 1 && y >= 0 && y < this.uData.length - 1){
+  while(x >= 0 && x < this.uData[0].length && y >= 0 && y < this.uData.length){
     var values = this.getValueAtPoint(x, y);
     x = x + values.u;
     y = y + values.v;
-    if(this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
+    if(x < 0 || y < 0 || x>= this.uData[0].length || y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
     outLine.push([x, y]);
     lineFound = true;
     this.usedPixels[Math.floor(y)][Math.floor(x)] = true;
   }
   if(lineFound){
+    this.usedPixels[y0][x0] = true;
     return outLine;
   } else {
     return false;
