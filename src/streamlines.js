@@ -1,9 +1,13 @@
 export var streamlines = function(uData, vData, geotransform){
-  var output = [];
+
+  var output = { "type": "FeatureCollection",
+    "features": []
+  };
+  var num_lines = 0;
   var inst = new Streamlines(uData, vData);
   if(!geotransform){
     geotransform = [0,1,0,0,0,1];
-  } else if(geotransform.length != 6){
+  } else if(geotransform.length !== 6){
     throw new Error('Bad geotransform');
   }
   //Iterate different points to start lines while available pixels
@@ -29,7 +33,12 @@ export var streamlines = function(uData, vData, geotransform){
     pixel = inst.findEmptyPixel(x,y,1);
     line = inst.getLine(pixel.x, pixel.y, geotransform);
     if(line){
-      output.push(line);
+      output.features.push({"type": "Feature",
+         "geometry": {
+           "type": "MultiLineString",
+          "coordinates": line},
+          "properties": [{"num_line": num_lines}]});
+      num_lines++;
     }
     pos++;
   }
@@ -100,6 +109,7 @@ Streamlines.prototype.getLine = function(x0, y0, geotransform) {
     var values = this.getValueAtPoint(x, y);
     x = x + values.u;
     y = y + values.v;
+    if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
     if(x < 0 || y < 0 || x>= this.uData[0].length || y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
     outLine.push(this.applyGeoTransform(x, y, geotransform));
     lineFound = true;
@@ -118,7 +128,7 @@ Streamlines.prototype.applyGeoTransform = function(x, y, geotransform) {
 };
 
 Streamlines.prototype.getValueAtPoint = function(x, y) {
-  var u, v, mdl;
+  var u, v, mdl, distTotal;
   var dist1 = Math.sqrt((Math.floor(x) - x) * (Math.floor(x) - x) + (Math.floor(y) - y) * (Math.floor(y) - y));
   var dist2 = Math.sqrt((Math.floor(x) - x) * (Math.floor(x) - x) + (Math.ceil(y) - y) * (Math.ceil(y) - y));
   var dist3 = Math.sqrt((Math.ceil(x) - x) * (Math.ceil(x) - x) + (Math.ceil(y) - y) * (Math.ceil(y) - y));
@@ -136,19 +146,37 @@ Streamlines.prototype.getValueAtPoint = function(x, y) {
     u = this.uData[Math.floor(y)][Math.ceil(x)];
     v = this.vData[Math.floor(y)][Math.ceil(x)];
   } else {
-    u = ((this.uData[Math.floor(y)][Math.floor(x)]/dist1)+
-    (this.uData[Math.ceil(y)][Math.floor(x)]/dist2)+
-    (this.uData[Math.ceil(y)][Math.ceil(x)]/dist3)+
-    (this.uData[Math.floor(y)][Math.ceil(x)]/dist4))/
-    ((1/dist1)+(1/dist2)+(1/dist3)+(1/dist4));
+    distTotal = 0;
+    u = 0;
+    v = 0;
+    if(this.uData[Math.floor(y)][Math.floor(x)]){
+      u+=this.uData[Math.floor(y)][Math.floor(x)]/dist1;
+      v+=this.vData[Math.floor(y)][Math.floor(x)]/dist1;
+      distTotal+=(1/dist1);
+    }
+    if(this.uData[Math.ceil(y)][Math.floor(x)]){
+      u+=this.uData[Math.ceil(y)][Math.floor(x)]/dist2;
+      v+=this.vData[Math.ceil(y)][Math.floor(x)]/dist2;
+      distTotal+=(1/dist2);
+    }
+    if(this.uData[Math.ceil(y)][Math.ceil(x)]){
+      u+=this.uData[Math.ceil(y)][Math.ceil(x)]/dist3;
+      v+=this.vData[Math.ceil(y)][Math.ceil(x)]/dist3;
+      distTotal+=(1/dist3);
+    }
+    if(this.uData[Math.floor(y)][Math.ceil(x)]){
+      u+=this.uData[Math.floor(y)][Math.ceil(x)]/dist4;
+      v+=this.vData[Math.floor(y)][Math.ceil(x)]/dist4;
+      distTotal+=(1/dist4);
+    }
+    u = u/distTotal;
+    v = v/distTotal;
 
-
-    v = ((this.vData[Math.floor(y)][Math.floor(x)]/dist1)+
-    (this.vData[Math.ceil(y)][Math.floor(x)]/dist2)+
-    (this.vData[Math.ceil(y)][Math.ceil(x)]/dist3)+
-    (this.vData[Math.floor(y)][Math.ceil(x)]/dist4))/
-    ((1/dist1)+(1/dist2)+(1/dist3)+(1/dist4));
   }
   mdl = Math.sqrt(u*u+v*v);
-  return {u:u/mdl, v:v/mdl};
+  if(mdl!==0 && distTotal !== 0){
+    return {u:u/mdl, v:v/mdl};
+  } else {
+    return {u:0, v:0};
+  }
 };

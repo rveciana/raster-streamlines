@@ -23,6 +23,7 @@
   "devDependencies": {
     "canvas": "^1.6.2",
     "eslint": "^3.10.0",
+    "geotiff": "^0.3.3",
     "package-preamble": "0.0.2",
     "rollup": "^0.36.3",
     "tape": "^4.6.2",
