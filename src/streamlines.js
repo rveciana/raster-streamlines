@@ -1,6 +1,11 @@
-export var streamlines = function(uData, vData){
+export var streamlines = function(uData, vData, geotransform){
   var output = [];
   var inst = new Streamlines(uData, vData);
+  if(!geotransform){
+    geotransform = [0,1,0,0,0,1];
+  } else if(geotransform.length != 6){
+    throw new Error('Bad geotransform');
+  }
   //Iterate different points to start lines while available pixels
   var pixel = true;
   var line = true;
@@ -22,7 +27,7 @@ export var streamlines = function(uData, vData){
       y = uData.length - 1;
     }
     pixel = inst.findEmptyPixel(x,y,1);
-    line = inst.getLine(pixel.x, pixel.y);
+    line = inst.getLine(pixel.x, pixel.y, geotransform);
     if(line){
       output.push(line);
     }
@@ -83,17 +88,20 @@ Streamlines.prototype.isPixelFree = function(x0, y0, dist) {
   return true;
 };
 
-Streamlines.prototype.getLine = function(x0, y0) {
+Streamlines.prototype.getLine = function(x0, y0, geotransform) {
+  if(!geotransform){
+    throw new Error('No GeoTransform given');
+  }
   var lineFound = false;
   var x = x0;
   var y = y0;
-  var outLine = [[x, y]];
+  var outLine = [this.applyGeoTransform(x, y, geotransform)];
   while(x >= 0 && x < this.uData[0].length && y >= 0 && y < this.uData.length){
     var values = this.getValueAtPoint(x, y);
     x = x + values.u;
     y = y + values.v;
     if(x < 0 || y < 0 || x>= this.uData[0].length || y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
-    outLine.push([x, y]);
+    outLine.push(this.applyGeoTransform(x, y, geotransform));
     lineFound = true;
     this.usedPixels[Math.floor(y)][Math.floor(x)] = true;
   }
@@ -103,6 +111,10 @@ Streamlines.prototype.getLine = function(x0, y0) {
   } else {
     return false;
   }
+};
+
+Streamlines.prototype.applyGeoTransform = function(x, y, geotransform) {
+  return [geotransform[0] + geotransform[1] * x + geotransform[2] * y, geotransform[3] + geotransform[4] * x + geotransform[5] * y];
 };
 
 Streamlines.prototype.getValueAtPoint = function(x, y) {

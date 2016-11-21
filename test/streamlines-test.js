@@ -3,7 +3,6 @@ streamlines = require("../");
 
 tape("Testing the most simple streamlines", function(test) {
   var data;
-
   data = createSimpleMatrix(0, 1, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),
   [ [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ],
@@ -24,6 +23,11 @@ tape("Testing the most simple streamlines", function(test) {
   [ [ [ 2, 2 ], [ 1, 2 ], [ 0, 2 ] ],
   [ [ 2, 0 ], [ 1, 0 ], [ 0, 0 ] ] ]);
 
+  //Test geotransform
+  test.deepEqual(streamlines.streamlines(data.u, data.v, [1,1,0,0,0,1]),
+  [ [ [ 3, 2 ], [ 2, 2 ], [ 1, 2 ] ],
+  [ [ 3, 0 ], [ 2, 0 ], [ 1, 0 ] ] ]);
+
   test.end();
 });
 
@@ -36,6 +40,9 @@ tape("Testing errors", function(test) {
 
   data = createSimpleMatrix(0.5, 1, 2, 1);
   test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster is too small/, "Should throw typeError");
+
+  data = createSimpleMatrix(0.5, 1, 5, 5);
+  test.throws(function() {streamlines.streamlines(data.u, data.v, [1]);}, /Bad geotransform/, "Should throw typeError");
 
   test.end();
 });
