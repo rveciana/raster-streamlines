@@ -7,34 +7,34 @@ tape("Testing the most simple streamlines", function(test) {
   var data;
   data = createSimpleMatrix(0, 1, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),
-  { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ], type: 'MultiLineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
-  { geometry: { coordinates: [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ], type: 'MultiLineString' },
+  { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ], type: 'LineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
+  { geometry: { coordinates: [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ], type: 'LineString' },
   properties: [ { num_line: 1 } ], type: 'Feature' } ], type: 'FeatureCollection' });
 
 
   data = createSimpleMatrix(0, -1, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),
-  { features: [ { geometry: { coordinates: [ [ 2, 2 ], [ 2, 1 ], [ 2, 0 ] ], type: 'MultiLineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
-  { geometry: { coordinates: [ [ 0, 2 ], [ 0, 1 ], [ 0, 0 ] ], type: 'MultiLineString' },
+  { features: [ { geometry: { coordinates: [ [ 2, 2 ], [ 2, 1 ], [ 2, 0 ] ], type: 'LineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
+  { geometry: { coordinates: [ [ 0, 2 ], [ 0, 1 ], [ 0, 0 ] ], type: 'LineString' },
   properties: [ { num_line: 1 } ], type: 'Feature' } ], type: 'FeatureCollection' });
 
 
   data = createSimpleMatrix(1, 0, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),
-  { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ], type: 'MultiLineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
-  { geometry: { coordinates: [ [ 0, 2 ], [ 1, 2 ], [ 2, 2 ] ], type: 'MultiLineString' },
+  { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ], type: 'LineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
+  { geometry: { coordinates: [ [ 0, 2 ], [ 1, 2 ], [ 2, 2 ] ], type: 'LineString' },
   properties: [ { num_line: 1 } ], type: 'Feature' } ], type: 'FeatureCollection' });
 
   data = createSimpleMatrix(-1, 0, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),
-  { features: [ { geometry: { coordinates: [ [ 2, 2 ], [ 1, 2 ], [ 0, 2 ] ], type: 'MultiLineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
-  { geometry: { coordinates: [ [ 2, 0 ], [ 1, 0 ], [ 0, 0 ] ], type: 'MultiLineString' },
+  { features: [ { geometry: { coordinates: [ [ 2, 2 ], [ 1, 2 ], [ 0, 2 ] ], type: 'LineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
+  { geometry: { coordinates: [ [ 2, 0 ], [ 1, 0 ], [ 0, 0 ] ], type: 'LineString' },
   properties: [ { num_line: 1 } ], type: 'Feature' } ], type: 'FeatureCollection' });
 
   //Test geotransform
   test.deepEqual(streamlines.streamlines(data.u, data.v, [1,1,0,0,0,1]),
-  { features: [ { geometry: { coordinates: [ [ 3, 2 ], [ 2, 2 ], [ 1, 2 ] ], type: 'MultiLineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
-  { geometry: { coordinates: [ [ 3, 0 ], [ 2, 0 ], [ 1, 0 ] ], type: 'MultiLineString' },
+  { features: [ { geometry: { coordinates: [ [ 3, 2 ], [ 2, 2 ], [ 1, 2 ] ], type: 'LineString' }, properties: [ { num_line: 0 } ], type: 'Feature' },
+  { geometry: { coordinates: [ [ 3, 0 ], [ 2, 0 ], [ 1, 0 ] ], type: 'LineString' },
   properties: [ { num_line: 1 } ], type: 'Feature' } ], type: 'FeatureCollection' });
 
   //Testing an absolute no-wind
@@ -73,7 +73,7 @@ tape("Testing with a GeoTIFF", function(test) {
       dataV[j] = new Array(image.getWidth());
       for (var i = 0; i<image.getWidth(); i++){
           dataU[j][i] = rasters[0][i + j*image.getWidth()];
-          dataV[j][i] = rasters[0][i + j*image.getWidth()];
+          dataV[j][i] = rasters[1][i + j*image.getWidth()];
       }
   }
 

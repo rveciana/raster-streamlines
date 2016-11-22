@@ -1,0 +1,2 @@
+node test/render-streamlines.js
+eog test/output/undefined.png
