@@ -1,2 +1,3 @@
 node test/render-streamlines.js
-eog test/output/undefined.png
+[ "$(compare -metric rmse test/samples/streamlines.png test/output/streamlines.png null: 2>&1)" = "0 (0)" ] \
+|| echo "✗ test/output/streamlines.png and test/samples/streamlines.png differ"

@@ -37,12 +37,12 @@ export var streamlines = function(uData, vData, geotransform){
          "geometry": {
            "type": "LineString",
           "coordinates": inst.applyGeoTransform(line, geotransform)},
-          "properties": [{"num_line": num_lines}]});
+          "properties": {"num_line": num_lines}
+        });
       num_lines++;
     }
     pos++;
   }
-
   return output;
 };
 
@@ -67,7 +67,7 @@ Streamlines.prototype.findEmptyPixel = function(x0, y0, dist) {
   if(this.isPixelFree(x0, y0, dist)){
     return {x:x0, y:y0};
   }
-  var maxDist = Math.max.apply(Math, [x0, y0, Math.abs(x0 - this.uData[0].length), Math.abs(y0 - this.uData.length)]);
+  var maxDist = this.uData[0].length + this.uData.length;
   for(var d = 2; d <= maxDist + 1; d=d+2){
     for(var pd = 0; pd<d; pd++){
       if(this.isPixelFree(pd+1+x0-d/2, y0-d/2, dist)){return {x:pd+1+x0-d/2, y:y0-d/2};}
@@ -102,18 +102,34 @@ Streamlines.prototype.getLine = function(x0, y0) {
   var lineFound = false;
   var x = x0;
   var y = y0;
+  var values;
   var outLine = [[x,y]];
   while(x >= 0 && x < this.uData[0].length && y >= 0 && y < this.uData.length){
-    var values = this.getValueAtPoint(x, y);
+    values = this.getValueAtPoint(x, y);
 
     x = x + values.u;
     y = y + values.v;
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
-    if(x < 0 || y < 0 || x>= this.uData[0].length || y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
+    if(x < 0 || y < 0 || x>= this.uData[0].length|| y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
     outLine.push([x,y]);
     lineFound = true;
     this.usedPixels[Math.floor(y)][Math.floor(x)] = true;
   }
+  //repeat the operation but backwards, so strange effects in some cases are avoided.
+  x = x0;
+  y = y0;
+  while(x >= 0 && x < this.uData[0].length && y >= 0 && y < this.uData.length){
+    values = this.getValueAtPoint(x, y);
+
+    x = x - values.u;
+    y = y - values.v;
+    if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
+    if(x < 0 || y < 0 || x>= this.uData[0].length || y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
+    outLine.unshift([x,y]);
+    lineFound = true;
+    this.usedPixels[Math.floor(y)][Math.floor(x)] = true;
+  }
+
   if(lineFound){
     this.usedPixels[y0][x0] = true;
     return outLine;

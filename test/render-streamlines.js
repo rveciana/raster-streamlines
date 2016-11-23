@@ -9,12 +9,9 @@ var fs = require("fs"),
 var width = 960,
     height= 500;
 
-var name = process.argv[2];
-
 var canvas = new Canvas(width, height),
 context = canvas.getContext("2d");
 
-//var projection = d3_geo.geoEquirectangular();
 var projection = d3_geo.geoConicConformal()
     .rotate([82, 0])
     .center([0, 34.83158])
@@ -26,13 +23,13 @@ var path = d3_geo.geoPath()
     .projection(projection)
     .context(context);
 
-var topojsonData = JSON.parse(fs.readFileSync("test/world-110m.json", "utf-8"));
+var topojsonData = JSON.parse(fs.readFileSync("test/samples/world-110m.json", "utf-8"));
 context.beginPath();
 context.strokeStyle = "#000";
 path(topojson.mesh(topojsonData));
 context.stroke();
 
-var tiffData = fs.readFileSync("test/wrf.tiff");
+var tiffData = fs.readFileSync("test/samples/wrf.tiff");
 var arrayBuffer = tiffData.buffer.slice(tiffData.byteOffset, tiffData.byteOffset + tiffData.byteLength);
 var tiff = geotiff.parse(arrayBuffer);
 var image = tiff.getImage();
@@ -53,12 +50,14 @@ var pixelScale = image.getFileDirectory().ModelPixelScale;
 var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
 var lines = streamlines.streamlines(dataU,dataV, geoTransform);
 
-  lines.features.forEach(function(d, i) {
+  lines.features.forEach(function(d) {
     context.beginPath();
     context.strokeStyle = "#000000";
     path(d);
     context.stroke();
   });
 
-console.warn("↳ test/output/" + name + ".png");
-canvas.pngStream().pipe(fs.createWriteStream("test/output/"+name+".png"));
+fs.writeFileSync('/tmp/data.json', JSON.stringify(lines, null, 2) , 'utf-8');
+
+console.warn("↳ test/output/streamlines.png");
+canvas.pngStream().pipe(fs.createWriteStream("test/output/streamlines.png"));
