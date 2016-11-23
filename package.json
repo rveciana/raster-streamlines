@@ -1,11 +1,11 @@
 {
   "name": "raster-streamlines",
   "version": "0.0.0",
-  "description": "Generates stramlines as SVG paths from a raster field",
+  "description": "Generates stramlines as a GeoJSON from a raster field",
   "main": "build/raster-streamlines.js",
   "jsnext:main": "index",
   "scripts": {
-    "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -n spp -o build/raster-streamlines.js -- index.js",
+    "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -n rs -o build/raster-streamlines.js -- index.js",
     "test": "tape 'test/*-test.js' && mkdir -p test/output && test/compare-images && eslint index.js src",
     "prepublish": "npm run test && uglifyjs --preamble \"$(preamble)\" build/raster-streamlines.js -c -m -o build/raster-streamlines.min.js",
     "postpublish": "git push && git push --tags"
@@ -19,7 +19,14 @@
     "name": "Roger Veciana i Rovira",
     "url": "https://geoexamples.com"
   },
-  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rveciana/raster-streamlines/issues"
+},
+  "license": "BSD-3-Clause",
+  "repository": {
+  "type": "git",
+  "url": "git+https://github.com/rveciana/raster-streamlines.git"
+},
   "devDependencies": {
     "canvas": "^1.6.2",
     "d3-geo": "^1.4.0",

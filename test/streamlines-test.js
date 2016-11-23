@@ -63,6 +63,34 @@ tape("Testing errors", function(test) {
   test.end();
 });
 
+tape("Testing complex examples", function(test) {
+
+  var tiffData = fs.readFileSync("test/samples/wrf.tiff");
+  var arrayBuffer = tiffData.buffer.slice(tiffData.byteOffset, tiffData.byteOffset + tiffData.byteLength);
+  var tiff = geotiff.parse(arrayBuffer);
+  var image = tiff.getImage();
+  var rasters = image.readRasters();
+  var dataU = new Array(image.getHeight());
+  var dataV = new Array(image.getHeight());
+  for (var j = 0; j<image.getHeight(); j++){
+      dataU[j] = new Array(image.getWidth());
+      dataV[j] = new Array(image.getWidth());
+      for (var i = 0; i<image.getWidth(); i++){
+          dataU[j][i] = rasters[0][i + j*image.getWidth()];
+          dataV[j][i] = rasters[1][i + j*image.getWidth()];
+      }
+  }
+
+  var tiepoint = image.getTiePoints()[0];
+  var pixelScale = image.getFileDirectory().ModelPixelScale;
+  var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
+  var lines = streamlines.streamlines(dataU,dataV, geoTransform);
+
+  test.equals(lines.features.length, 149, "Correct number of streamlines is 149");
+
+  test.end();
+});
+
 function createSimpleMatrix(uVal, vVal, xSize, ySize){
   var dataU = [];
   var dataV = [];

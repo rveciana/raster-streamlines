@@ -159,16 +159,16 @@ Streamlines.prototype.getValueAtPoint = function(x, y) {
   var dist2 = Math.sqrt((Math.floor(x) - x) * (Math.floor(x) - x) + (Math.ceil(y) - y) * (Math.ceil(y) - y));
   var dist3 = Math.sqrt((Math.ceil(x) - x) * (Math.ceil(x) - x) + (Math.ceil(y) - y) * (Math.ceil(y) - y));
   var dist4 = Math.sqrt((Math.ceil(x) - x) * (Math.ceil(x) - x) + (Math.floor(y) - y) * (Math.floor(y) - y));
-  if(dist1 < 0.0000001){
+  if(dist1 < 0.01){
     u = this.uData[Math.floor(y)][Math.floor(x)];
     v = this.vData[Math.floor(y)][Math.floor(x)];
-  } else if(dist2 < 0.0000001){
+  } else if(dist2 < 0.01){
     u = this.uData[Math.ceil(y)][Math.floor(x)];
     v = this.vData[Math.ceil(y)][Math.floor(x)];
-  } else if(dist3 < 0.0000001){
+  } else if(dist3 < 0.01){
     u = this.uData[Math.ceil(y)][Math.ceil(x)];
     v = this.vData[Math.ceil(y)][Math.ceil(x)];
-  } else if(dist4 < 0.0000001){
+  } else if(dist4 < 0.01){
     u = this.uData[Math.floor(y)][Math.ceil(x)];
     v = this.vData[Math.floor(y)][Math.ceil(x)];
   } else {
