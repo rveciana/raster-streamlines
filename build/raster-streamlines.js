@@ -2,7 +2,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.spp = global.spp || {})));
+  (factory((global.rs = global.rs || {})));
 }(this, (function (exports) { 'use strict';
 
 var streamlines = function(uData, vData, geotransform){
