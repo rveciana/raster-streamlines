@@ -44,6 +44,13 @@ tape("Testing the most simple streamlines", function(test) {
   data = createSimpleMatrix(0, 0, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),{ features: [], type: 'FeatureCollection' });
 
+  //Flip y direction
+  data = createSimpleMatrix(0, 1, 3, 3);
+  test.deepEqual(streamlines.streamlines(data.u, data.v, [0,1,0,0,0,1], true),
+  { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ], type: 'LineString' }, properties: { num_line: 0 }, type: 'Feature' },
+  { geometry: { coordinates: [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ], type: 'LineString' },
+  properties: { num_line: 1 }, type: 'Feature' } ], type: 'FeatureCollection' });
+
   test.end();
 });
 

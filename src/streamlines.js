@@ -1,4 +1,4 @@
-export var streamlines = function(uData, vData, geotransform){
+export var streamlines = function(uData, vData, geotransform, flip){
 
   var output = { "type": "FeatureCollection",
     "features": []
@@ -31,7 +31,7 @@ export var streamlines = function(uData, vData, geotransform){
       y = uData.length - 1;
     }
     pixel = inst.findEmptyPixel(x,y,1);
-    line = inst.getLine(pixel.x, pixel.y);
+    line = inst.getLine(pixel.x, pixel.y, flip);
     if(line){
       output.features.push({"type": "Feature",
          "geometry": {
@@ -97,18 +97,19 @@ Streamlines.prototype.isPixelFree = function(x0, y0, dist) {
   return true;
 };
 
-Streamlines.prototype.getLine = function(x0, y0) {
+Streamlines.prototype.getLine = function(x0, y0, flip) {
 
   var lineFound = false;
   var x = x0;
   var y = y0;
   var values;
   var outLine = [[x,y]];
+  if(flip){flip = 1;} else {flip = -1;}
   while(x >= 0 && x < this.uData[0].length && y >= 0 && y < this.uData.length){
     values = this.getValueAtPoint(x, y);
 
     x = x + values.u;
-    y = y - values.v; //The wind convention says v goes from bottom to top
+    y = y + flip * values.v; //The wind convention says v goes from bottom to top
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
     if(x < 0 || y < 0 || x>= this.uData[0].length|| y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
     outLine.push([x,y]);
@@ -122,7 +123,7 @@ Streamlines.prototype.getLine = function(x0, y0) {
     values = this.getValueAtPoint(x, y);
 
     x = x - values.u;
-    y = y + values.v; //The wind convention says v goes from bottom to top
+    y = y - flip * values.v; //The wind convention says v goes from bottom to top
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
     if(x < 0 || y < 0 || x>= this.uData[0].length || y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
     outLine.unshift([x,y]);
