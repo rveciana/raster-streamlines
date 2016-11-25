@@ -1,6 +1,6 @@
 {
   "name": "raster-streamlines",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Generates stramlines as a GeoJSON from a raster field",
   "main": "build/raster-streamlines.js",
   "jsnext:main": "index",
@@ -22,12 +22,12 @@
   },
   "bugs": {
     "url": "https://github.com/rveciana/raster-streamlines/issues"
-},
+  },
   "license": "BSD-3-Clause",
   "repository": {
-  "type": "git",
-  "url": "git+https://github.com/rveciana/raster-streamlines.git"
-},
+    "type": "git",
+    "url": "git+https://github.com/rveciana/raster-streamlines.git"
+  },
   "devDependencies": {
     "canvas": "^1.6.2",
     "d3-geo": "^1.4.0",
