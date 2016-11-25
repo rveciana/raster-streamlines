@@ -8,15 +8,15 @@ tape("Testing the most simple streamlines", function(test) {
 
   data = createSimpleMatrix(0, 1, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),
-  { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ], type: 'LineString' }, properties: { num_line: 0 }, type: 'Feature' },
-  { geometry: { coordinates: [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ], type: 'LineString' },
+  { features: [ { geometry: { coordinates: [ [ 0, 2 ], [ 0, 1 ], [ 0, 0 ] ], type: 'LineString' }, properties: { num_line: 0 }, type: 'Feature' },
+  { geometry: { coordinates: [ [ 2, 2 ], [ 2, 1 ], [ 2, 0 ] ], type: 'LineString' },
   properties: { num_line: 1 }, type: 'Feature' } ], type: 'FeatureCollection' });
 
 
   data = createSimpleMatrix(0, -1, 3, 3);
   test.deepEqual(streamlines.streamlines(data.u, data.v),
-  { features: [ { geometry: { coordinates: [ [ 0, 2 ], [ 0, 1 ], [ 0, 0 ] ], type: 'LineString' }, properties: { num_line: 0 }, type: 'Feature' },
-  { geometry: { coordinates: [ [ 2, 2 ], [ 2, 1 ], [ 2, 0 ] ], type: 'LineString' },
+  { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ], type: 'LineString' }, properties: { num_line: 0 }, type: 'Feature' },
+  { geometry: { coordinates: [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ], type: 'LineString' },
   properties: { num_line: 1 }, type: 'Feature' } ], type: 'FeatureCollection' });
 
 
@@ -86,7 +86,7 @@ tape("Testing complex examples", function(test) {
   var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
   var lines = streamlines.streamlines(dataU,dataV, geoTransform);
 
-  test.equals(lines.features.length, 149, "Correct number of streamlines is 149");
+  test.equals(lines.features.length, 151, "Correct number of streamlines is 149");
 
   test.end();
 });

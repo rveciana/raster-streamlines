@@ -115,7 +115,7 @@ Streamlines.prototype.getLine = function(x0, y0) {
     values = this.getValueAtPoint(x, y);
 
     x = x + values.u;
-    y = y + values.v;
+    y = y - values.v; //The wind convention says v goes from bottom to top
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
     if(x < 0 || y < 0 || x>= this.uData[0].length|| y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
     outLine.push([x,y]);
@@ -129,7 +129,7 @@ Streamlines.prototype.getLine = function(x0, y0) {
     values = this.getValueAtPoint(x, y);
 
     x = x - values.u;
-    y = y - values.v;
+    y = y + values.v; //The wind convention says v goes from bottom to top
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
     if(x < 0 || y < 0 || x>= this.uData[0].length || y >= this.uData.length || this.usedPixels[Math.floor(y)][Math.floor(x)]){break;}
     outLine.unshift([x,y]);
