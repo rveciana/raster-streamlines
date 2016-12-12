@@ -1,8 +1,8 @@
-// raster-streamlines Version 0.0.0. Copyright 2016 Roger Veciana i Rovira.
+// raster-streamlines Version 0.0.1. Copyright 2016 Roger Veciana i Rovira.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.rs = global.rs || {})));
+  (factory((global.rastertools = global.rastertools || {})));
 }(this, (function (exports) { 'use strict';
 
 var streamlines = function(uData, vData, geotransform, flip){

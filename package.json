@@ -5,7 +5,7 @@
   "main": "build/raster-streamlines.js",
   "jsnext:main": "index",
   "scripts": {
-    "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -n rs -o build/raster-streamlines.js -- index.js",
+    "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -n rastertools -o build/raster-streamlines.js -- index.js",
     "test": "tape 'test/*-test.js' && mkdir -p test/output && test/compare-images && eslint index.js src",
     "posttest": "uglifyjs --preamble \"$(preamble)\" build/raster-streamlines.js -c -m -o build/raster-streamlines.min.js",
     "prepublish": "npm run test",
