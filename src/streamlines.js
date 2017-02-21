@@ -1,5 +1,5 @@
-export var streamlines = function(uData, vData, geotransform, flip){
-
+export var streamlines = function(uData, vData, geotransform, density, flip){
+  density = density || 1;
   var output = { "type": "FeatureCollection",
     "features": []
   };
@@ -30,7 +30,11 @@ export var streamlines = function(uData, vData, geotransform, flip){
       x = 0;
       y = uData.length - 1;
     }
-    pixel = inst.findEmptyPixel(x,y,1);
+    //The density affects the pixel distance
+    var pixelDist = Math.round(uData.length / (60 * density));
+    pixelDist = pixelDist>0?pixelDist:1;
+
+    pixel = inst.findEmptyPixel(x,y,pixelDist);
     line = inst.getLine(pixel.x, pixel.y, flip);
     if(line){
       output.features.push({"type": "Feature",

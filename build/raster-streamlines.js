@@ -1,12 +1,12 @@
-// raster-streamlines Version 0.0.1. Copyright 2016 Roger Veciana i Rovira.
+// raster-streamlines Version 0.0.2. Copyright 2017 Roger Veciana i Rovira.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (factory((global.rastertools = global.rastertools || {})));
 }(this, (function (exports) { 'use strict';
 
-var streamlines = function(uData, vData, geotransform, flip){
-
+var streamlines = function(uData, vData, geotransform, density, flip){
+  density = density || 1;
   var output = { "type": "FeatureCollection",
     "features": []
   };
@@ -37,7 +37,11 @@ var streamlines = function(uData, vData, geotransform, flip){
       x = 0;
       y = uData.length - 1;
     }
-    pixel = inst.findEmptyPixel(x,y,1);
+    //The density affects the pixel distance
+    var pixelDist = Math.round(uData.length / (60 * density));
+    pixelDist = pixelDist>0?pixelDist:1;
+
+    pixel = inst.findEmptyPixel(x,y,pixelDist);
     line = inst.getLine(pixel.x, pixel.y, flip);
     if(line){
       output.features.push({"type": "Feature",

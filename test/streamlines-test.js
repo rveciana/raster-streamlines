@@ -46,7 +46,7 @@ tape("Testing the most simple streamlines", function(test) {
 
   //Flip y direction
   data = createSimpleMatrix(0, 1, 3, 3);
-  test.deepEqual(streamlines.streamlines(data.u, data.v, [0,1,0,0,0,1], true),
+  test.deepEqual(streamlines.streamlines(data.u, data.v, [0,1,0,0,0,1], 1, true),
   { features: [ { geometry: { coordinates: [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ] ], type: 'LineString' }, properties: { num_line: 0 }, type: 'Feature' },
   { geometry: { coordinates: [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ], type: 'LineString' },
   properties: { num_line: 1 }, type: 'Feature' } ], type: 'FeatureCollection' });
@@ -93,7 +93,11 @@ tape("Testing complex examples", function(test) {
   var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
   var lines = streamlines.streamlines(dataU,dataV, geoTransform);
 
-  test.equals(lines.features.length, 151, "Correct number of streamlines is 149");
+  test.equals(lines.features.length, 151, "Correct number of streamlines is 151");
+
+  lines = streamlines.streamlines(dataU,dataV, geoTransform, 0.5);
+
+  test.equals(lines.features.length, 68, "Correct number of streamlines with density = 0.5 is 151");
 
   test.end();
 });
