@@ -25,9 +25,11 @@ var path = d3_geo.geoPath()
 
 var topojsonData = JSON.parse(fs.readFileSync("test/samples/world-110m.json", "utf-8"));
 context.beginPath();
-context.strokeStyle = "#000";
+context.strokeStyle = "#8a8";
+context.lineWidth = 3;
 path(topojson.mesh(topojsonData));
 context.stroke();
+context.lineWidth = 1;
 
 var tiffData = fs.readFileSync("test/samples/wrf.tiff");
 var arrayBuffer = tiffData.buffer.slice(tiffData.byteOffset, tiffData.byteOffset + tiffData.byteLength);
