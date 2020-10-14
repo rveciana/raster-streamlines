@@ -1,6 +1,7 @@
-export var streamlines = function(uData, vData, geotransform, density, flip){
+export var streamlines = function(uData, vData, geotransform, density, flip) {
   density = density || 1;
-  var output = { "type": "FeatureCollection",
+  var output = {
+    "type": "FeatureCollection",
     "features": []
   };
   var num_lines = 0;
@@ -10,42 +11,30 @@ export var streamlines = function(uData, vData, geotransform, density, flip){
   } else if(geotransform.length !== 6){
     throw new Error('Bad geotransform');
   }
-  //Iterate different points to start lines while available pixels
-  var pixel = true;
-  var line = true;
 
-  var pos = 0;
-  var x, y;
-  while(pixel){
-    if(pos%4 === 0){
-      x = 0;
-      y = 0;
-    } else if(pos%4 === 1){
-      x = inst.xSize - 1;
-      y = inst.ySize - 1;
-    } else if(pos%4 === 2){
-      x = inst.xSize - 1;
-      y = 0;
-    } else{
-      x = 0;
-      y = inst.ySize - 1;
-    }
-    //The density affects the pixel distance
-    var pixelDist = Math.round(inst.ySize / (60 * density));
-    pixelDist = pixelDist>0?pixelDist:1;
+  //The density affects the pixel distance
+  const pixelDist = Math.round(inst.ySize / (60 * density)) || 1;
 
-    pixel = inst.findEmptyPixel(x,y,pixelDist);
-    line = inst.getLine(pixel.x, pixel.y, flip);
-    if(line){
-      output.features.push({"type": "Feature",
-         "geometry": {
-           "type": "LineString",
-          "coordinates": inst.applyGeoTransform(line, geotransform)},
-          "properties": {"num_line": num_lines}
+  // Iterate over all grid points in pseudo-random order and try to start a line there
+  var N = inst.xSize * inst.ySize;
+  for(var pos = 0; pos < N; pos++){
+    var n = (pos * 327685) % N; // We trust that this large prime doesn't divide either dimension.
+    var x = Math.trunc(n / inst.ySize);
+    var y = n % inst.ySize;
+    if(inst.isPixelFree(x, y, pixelDist)){
+      var line = inst.getLine(x, y, flip);
+      if(line){
+        output.features.push({
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": inst.applyGeoTransform(line, geotransform)
+          },
+          "properties": { "num_line": num_lines }
         });
-      num_lines++;
+        num_lines++;
+      }
     }
-    pos++;
   }
   return output;
 };
@@ -71,34 +60,18 @@ function Streamlines(uData, vData){
   }
 }
 
-Streamlines.prototype.findEmptyPixel = function(x0, y0, dist) {
-  //Explores around the init pixel creating squares to find an empty pixel
-  if(this.isPixelFree(x0, y0, dist)){
-    return {x:x0, y:y0};
-  }
-  var maxDist = this.xSize + this.ySize;
-  for(var d = 2; d <= maxDist + 1; d=d+2){
-    for(var pd = 0; pd<d; pd++){
-      if(this.isPixelFree(pd+1+x0-d/2, y0-d/2, dist)){return {x:pd+1+x0-d/2, y:y0-d/2};}
-      if(this.isPixelFree(x0-d/2, pd+y0-d/2, dist)){return {x:x0-d/2, y:pd+y0-d/2};}
-      if(this.isPixelFree(d+x0-d/2, pd+1+y0-d/2, dist)){return {x:d+x0-d/2, y:pd+1+y0-d/2};}
-      if(this.isPixelFree(pd+x0-d/2, d+y0-d/2, dist)){return {x:pd+x0-d/2, y:d+y0-d/2};}
-    }
-
-  }
-  return false;
-};
-
 Streamlines.prototype.isPixelFree = function(x0, y0, dist) {
-  if(x0<0 || x0>=this.usedPixels[0].length || y0<0 || y0 >= this.usedPixels.length){
+  if(x0<0 || x0>=this.xSize || y0<0 || y0 >= this.ySize){
     return false;
   }
-  for(var i=-dist; i<=dist;i++){
-    for(var j=-dist; j<=dist;j++){
-      if(y0+j>=0 &&y0+j<this.usedPixels.length && x0+i>=0 && x0+i<this.usedPixels[y0].length){
-        if(this.usedPixels[y0+j][x0+i]){
-          return false;
-        }
+  const xLow = Math.max(x0-dist, 0);
+  const xHigh = Math.min(x0+dist, this.xSize-1);
+  const yLow = Math.max(y0-dist, 0);
+  const yHigh = Math.min(y0+dist, this.ySize-1);
+  for(var x=xLow; x<=xHigh; x++){
+    for(var y = yLow; y <= yHigh; y++){
+      if(this.usedPixels[y][x]){
+        return false;
       }
     }
   }
