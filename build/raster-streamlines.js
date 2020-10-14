@@ -28,17 +28,17 @@ var streamlines = function(uData, vData, geotransform, density, flip){
       x = 0;
       y = 0;
     } else if(pos%4 === 1){
-      x = uData[0].length - 1;
-      y = uData.length - 1;
+      x = inst.xSize - 1;
+      y = inst.ySize - 1;
     } else if(pos%4 === 2){
-      x = uData[0].length - 1;
+      x = inst.xSize - 1;
       y = 0;
     } else{
       x = 0;
-      y = uData.length - 1;
+      y = inst.ySize - 1;
     }
     //The density affects the pixel distance
-    var pixelDist = Math.round(uData.length / (60 * density));
+    var pixelDist = Math.round(inst.ySize / (60 * density));
     pixelDist = pixelDist>0?pixelDist:1;
 
     pixel = inst.findEmptyPixel(x,y,pixelDist);
@@ -61,14 +61,17 @@ function Streamlines(uData, vData){
   if(uData.length <= 1 || vData.length <= 1 || uData[0].length <= 1 || vData[0].length <= 1){
     throw new Error('Raster is too small');
   }
+  if(uData.length !== vData.length || uData[0].length !== vData[0].length){
+    throw new Error('Raster components are not the same shape');
+  }
   this.uData = uData;
   this.vData = vData;
   this.xSize = this.uData[0].length;
   this.ySize = this.uData.length;
   this.usedPixels = [];
-  for(var i = 0; i<uData.length; i++){
+  for(var y = 0; y<this.ySize; y++){
     var line = [];
-    for(var j = 0; j<uData[0].length; j++){
+    for(var x = 0; x<this.xSize; x++){
       line.push(false);
     }
     this.usedPixels.push(line);
@@ -80,7 +83,7 @@ Streamlines.prototype.findEmptyPixel = function(x0, y0, dist) {
   if(this.isPixelFree(x0, y0, dist)){
     return {x:x0, y:y0};
   }
-  var maxDist = this.uData[0].length + this.uData.length;
+  var maxDist = this.xSize + this.ySize;
   for(var d = 2; d <= maxDist + 1; d=d+2){
     for(var pd = 0; pd<d; pd++){
       if(this.isPixelFree(pd+1+x0-d/2, y0-d/2, dist)){return {x:pd+1+x0-d/2, y:y0-d/2};}
@@ -132,7 +135,7 @@ Streamlines.prototype.getLine = function(x0, y0, flip) {
   //repeat the operation but backwards, so strange effects in some cases are avoided.
   x = x0;
   y = y0;
-  while(x >= 0 && x < this.uData[0].length && y >= 0 && y < this.uData.length){
+  while(x >= 0 && x < this.xSize && y >= 0 && y < this.ySize){
     values = this.getValueAtPoint(x, y);
 
     x = x - values.u;

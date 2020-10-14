@@ -75,6 +75,18 @@ tape("Testing errors", function(test) {
   data = createSimpleMatrix(0.5, 1, 2, 1);
   test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster is too small/, "Should throw typeError");
 
+  data = {
+    u: [[0,0],[0,0],[0,0]],
+    v: [[0,0],[0,0]],
+  };
+  test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster components are not the same shape/, "Should throw typeError");
+
+  data = {
+    u: [[0,0],[0,0]],
+    v: [[0,0,0],[0,0,0]],
+  };
+  test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster components are not the same shape/, "Should throw typeError");
+
   data = createSimpleMatrix(0.5, 1, 5, 5);
   test.throws(function() {streamlines.streamlines(data.u, data.v, [1]);}, /Bad geotransform/, "Should throw typeError");
 
