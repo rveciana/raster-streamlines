@@ -54,6 +54,17 @@ tape("Testing the most simple streamlines", function(test) {
   test.end();
 });
 
+tape("Test particle blowing out of grid", { objectPrintDepth: 15 }, function(test) {
+  // Wind blows almost directly North with a slightly eastern component.
+  // This will blow particle to the point (2.0099995 2.99995)
+  // which caused the array index error in https://github.com/rveciana/raster-streamlines/issues/1
+  var uv = createSimpleMatrix(0.01, 1, 3, 3);
+  var lines = streamlines.streamlines(uv.u, uv.v, null, null, true);
+  test.equals(lines.features.length, 2, 'Should have lines');
+  test.pass("We're not testing what the lines look like, just that we don't explode.");
+  test.end();
+});
+
 tape("Testing errors", function(test) {
   var data = createSimpleMatrix(0.5, 1, 1, 1);
   test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster is too small/, "Should throw typeError");
@@ -63,6 +74,18 @@ tape("Testing errors", function(test) {
 
   data = createSimpleMatrix(0.5, 1, 2, 1);
   test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster is too small/, "Should throw typeError");
+
+  data = {
+    u: [[0,0],[0,0],[0,0]],
+    v: [[0,0],[0,0]],
+  };
+  test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster components are not the same shape/, "Should throw typeError");
+
+  data = {
+    u: [[0,0],[0,0]],
+    v: [[0,0,0],[0,0,0]],
+  };
+  test.throws(function() {streamlines.streamlines(data.u, data.v);}, /Raster components are not the same shape/, "Should throw typeError");
 
   data = createSimpleMatrix(0.5, 1, 5, 5);
   test.throws(function() {streamlines.streamlines(data.u, data.v, [1]);}, /Bad geotransform/, "Should throw typeError");
@@ -93,11 +116,11 @@ tape("Testing complex examples", function(test) {
   var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
   var lines = streamlines.streamlines(dataU,dataV, geoTransform);
 
-  test.equals(lines.features.length, 151, "Correct number of streamlines is 151");
+  test.equals(lines.features.length, 142, "Correct number of streamlines is 142");
 
   lines = streamlines.streamlines(dataU,dataV, geoTransform, 0.5);
 
-  test.equals(lines.features.length, 68, "Correct number of streamlines with density = 0.5 is 151");
+  test.equals(lines.features.length, 67, "Correct number of streamlines with density = 0.5 is 67");
 
   test.end();
 });

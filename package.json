@@ -37,7 +37,8 @@
     "package-preamble": "0.0.2",
     "rollup": "^0.36.3",
     "tape": "^4.6.2",
-    "topojson": "^2.0.0",
+    "topojson-server": "^2.0.0",
+    "topojson-simplify": "^2.0.0",
     "topojson-client": "^2.1.0",
     "uglify-js": "^2.7.4"
   }
