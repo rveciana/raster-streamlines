@@ -52,12 +52,23 @@ var pixelScale = image.getFileDirectory().ModelPixelScale;
 var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
 var lines = streamlines.streamlines(dataU,dataV, geoTransform);
 
-  lines.features.forEach(function(d) {
-    context.beginPath();
-    context.strokeStyle = "#000000";
-    path(d);
-    context.stroke();
-  });
+// If the TIMER_LOOPS environment variable is set, run streamlines that often and print total time.
+const TIMER_LOOPS = process.env.TIMER_LOOPS && Number.parseInt(process.env.TIMER_LOOPS);
+if (TIMER_LOOPS){
+  var before = Date.now();
+  for(var l = 0; l < TIMER_LOOPS; l++){
+    if((l+1) % 100 === 0) console.log(l+1);
+    streamlines.streamlines(dataU, dataV, geoTransform);
+  }
+  console.log('Elapsed time for %d iterations: %d', TIMER_LOOPS, Date.now()-before);
+}
+
+lines.features.forEach(function(d) {
+  context.beginPath();
+  context.strokeStyle = "#000000";
+  path(d);
+  context.stroke();
+});
 
 fs.writeFileSync('/tmp/data.json', JSON.stringify(lines, null, 2) , 'utf-8');
 
