@@ -51,6 +51,13 @@ tape("Testing the most simple streamlines", function(test) {
   { geometry: { coordinates: [ [ 2, 0 ], [ 2, 1 ], [ 2, 2 ] ], type: 'LineString' },
   properties: { num_line: 1 }, type: 'Feature' } ], type: 'FeatureCollection' });
 
+
+  // Test diagonal wind-direction
+  data = createSimpleMatrix(1, 1, 20, 20);
+  test.equals(streamlines.streamlines(data.u, data.v).features.length, 10, "There are 10 diagonal stream-lines");
+  // There were 27 short diagonal streamlines before https://github.com/rveciana/raster-streamlines/pull/5
+
+
   test.end();
 });
 
@@ -116,11 +123,11 @@ tape("Testing complex examples", function(test) {
   var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
   var lines = streamlines.streamlines(dataU,dataV, geoTransform);
 
-  test.equals(lines.features.length, 124, "Correct number of streamlines is 124");
+  test.equals(lines.features.length, 104, "Correct number of streamlines is 104");
 
   lines = streamlines.streamlines(dataU,dataV, geoTransform, 0.5);
 
-  test.equals(lines.features.length, 66, "Correct number of streamlines with density = 0.5 is 66");
+  test.equals(lines.features.length, 57, "Correct number of streamlines with density = 0.5 is 57");
 
   test.end();
 });

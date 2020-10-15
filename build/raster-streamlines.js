@@ -168,6 +168,7 @@ Streamlines.prototype.getValueAtPoint = function(x, y) {
   const pw10 = yw0*xw1;
   const pw11 = yw1*xw1;
 
+  // Interpolate the U,V vector components
   const u = (
     this.uData[y0][x0]*pw00+this.uData[y0][x1]*pw01+
     this.uData[y1][x0]*pw10+this.uData[y1][x1]*pw11
@@ -177,8 +178,9 @@ Streamlines.prototype.getValueAtPoint = function(x, y) {
     this.vData[y1][x0]*pw10+this.vData[y1][x1]*pw11
   );
 
-  // Scale u,v vector to unit length (but leave 0-vector alone)
-  const mdl = Math.sqrt(u*u+v*v) || 1;
+  // Scale u,v vector to make one of the components at least one so the trace steps into a new cell.
+  // Don't divide by 0 but instead pass 0-vectors through unchanged to be handled by the caller
+  const mdl = Math.max(Math.abs(u), Math.abs(v)) || 1;
   return { u: u/mdl, v: v/mdl };
 };
 
