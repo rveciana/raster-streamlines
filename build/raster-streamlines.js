@@ -81,42 +81,47 @@ Streamlines.prototype.isPixelFree = function(x0, y0, dist) {
 };
 
 Streamlines.prototype.getLine = function(x0, y0, flip) {
+  // Verify that seed point is available
+  if(x0 < 0 || y0 < 0 || x0 >= this.xSize || y0 >= this.ySize || this.usedPixels[y0][x0]) { return false; }
 
   var lineFound = false;
-  var x = x0;
-  var y = y0;
-  var x_, y_;
+  var x, y, xr, yr;
   var values;
-  var outLine = [[x,y]];
+  var outLine = [[x0,y0]];
   flip = flip ? 1 : -1;
-  while(x >= 0 && x < this.xSize && y >= 0 && y < this.ySize){
+
+  // Trace forward from seed point
+  x = x0;
+  y = y0;
+  while(true){
     values = this.getValueAtPoint(x, y);
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
 
     x += values.u;
     y += flip * values.v; //The wind convention says v goes from bottom to top
-    y_ = Math.floor(y);
-    x_ = Math.floor(x);
-    if(x < 0 || y < 0 || x>= this.xSize || y >= this.ySize || this.usedPixels[y_][x_]){break;}
+    yr = Math.round(y);
+    xr = Math.round(x);
+    if(xr < 0 || yr < 0 || xr >= this.xSize || yr >= this.ySize || this.usedPixels[yr][xr]) { break; }
     outLine.push([x,y]);
     lineFound = true;
-    this.usedPixels[y_][x_] = true;
+    this.usedPixels[yr][xr] = true;
   }
-  //repeat the operation but backwards, so strange effects in some cases are avoided.
+
+  // Trace backward from seed point
   x = x0;
   y = y0;
-  while(x >= 0 && x < this.xSize && y >= 0 && y < this.ySize){
+  while(true){
     values = this.getValueAtPoint(x, y);
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
 
     x -= values.u;
     y -= flip * values.v; //The wind convention says v goes from bottom to top
-    y_ = Math.floor(y);
-    x_ = Math.floor(x);
-    if(x < 0 || y < 0 || x>= this.xSize || y >= this.ySize || this.usedPixels[y_][x_]){break;}
-    outLine.unshift([x,y]);
+    yr = Math.round(y);
+    xr = Math.round(x);
+    if(xr < 0 || yr < 0 || xr >= this.xSize || yr >= this.ySize || this.usedPixels[yr][xr]) { break; }
+      outLine.unshift([x,y]);
     lineFound = true;
-    this.usedPixels[y_][x_] = true;
+    this.usedPixels[yr][xr] = true;
   }
 
   if(lineFound){

@@ -123,7 +123,7 @@ tape("Testing complex examples", function(test) {
   var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1*pixelScale[1]];
   var lines = streamlines.streamlines(dataU,dataV, geoTransform);
 
-  test.equals(lines.features.length, 104, "Correct number of streamlines is 104");
+  test.equals(lines.features.length, 108, "Correct number of streamlines is 108");
 
   lines = streamlines.streamlines(dataU,dataV, geoTransform, 0.5);
 
