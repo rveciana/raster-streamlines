@@ -74,42 +74,47 @@ Streamlines.prototype.isPixelFree = function(x0, y0, dist) {
 };
 
 Streamlines.prototype.getLine = function(x0, y0, flip) {
+  // Verify that seed point is available
+  if(x0 < 0 || y0 < 0 || x0 >= this.xSize || y0 >= this.ySize || this.usedPixels[y0][x0]) { return false; }
 
   var lineFound = false;
-  var x = x0;
-  var y = y0;
-  var x_, y_;
+  var x, y, xr, yr;
   var values;
-  var outLine = [[x,y]];
+  var outLine = [[x0,y0]];
   flip = flip ? 1 : -1;
-  while(x >= 0 && x < this.xSize && y >= 0 && y < this.ySize){
+
+  // Trace forward from seed point
+  x = x0;
+  y = y0;
+  while(true){
     values = this.getValueAtPoint(x, y);
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
 
     x += values.u;
     y += flip * values.v; //The wind convention says v goes from bottom to top
-    y_ = Math.floor(y);
-    x_ = Math.floor(x);
-    if(x < 0 || y < 0 || x>= this.xSize || y >= this.ySize || this.usedPixels[y_][x_]){break;}
+    yr = Math.round(y);
+    xr = Math.round(x);
+    if(xr < 0 || yr < 0 || xr >= this.xSize || yr >= this.ySize || this.usedPixels[yr][xr]) { break; }
     outLine.push([x,y]);
     lineFound = true;
-    this.usedPixels[y_][x_] = true;
+    this.usedPixels[yr][xr] = true;
   }
-  //repeat the operation but backwards, so strange effects in some cases are avoided.
+
+  // Trace backward from seed point
   x = x0;
   y = y0;
-  while(x >= 0 && x < this.xSize && y >= 0 && y < this.ySize){
+  while(true){
     values = this.getValueAtPoint(x, y);
     if(values.u === 0 && values.v === 0){this.usedPixels[y0][x0] = true; break;} //Zero speed points are problematic
 
     x -= values.u;
     y -= flip * values.v; //The wind convention says v goes from bottom to top
-    y_ = Math.floor(y);
-    x_ = Math.floor(x);
-    if(x < 0 || y < 0 || x>= this.xSize || y >= this.ySize || this.usedPixels[y_][x_]){break;}
-    outLine.unshift([x,y]);
+    yr = Math.round(y);
+    xr = Math.round(x);
+    if(xr < 0 || yr < 0 || xr >= this.xSize || yr >= this.ySize || this.usedPixels[yr][xr]) { break; }
+      outLine.unshift([x,y]);
     lineFound = true;
-    this.usedPixels[y_][x_] = true;
+    this.usedPixels[yr][xr] = true;
   }
 
   if(lineFound){
@@ -161,6 +166,7 @@ Streamlines.prototype.getValueAtPoint = function(x, y) {
   const pw10 = yw0*xw1;
   const pw11 = yw1*xw1;
 
+  // Interpolate the U,V vector components
   const u = (
     this.uData[y0][x0]*pw00+this.uData[y0][x1]*pw01+
     this.uData[y1][x0]*pw10+this.uData[y1][x1]*pw11
@@ -170,7 +176,8 @@ Streamlines.prototype.getValueAtPoint = function(x, y) {
     this.vData[y1][x0]*pw10+this.vData[y1][x1]*pw11
   );
 
-  // Scale u,v vector to unit length (but leave 0-vector alone)
-  const mdl = Math.sqrt(u*u+v*v) || 1;
+  // Scale u,v vector to make one of the components at least one so the trace steps into a new cell.
+  // Don't divide by 0 but instead pass 0-vectors through unchanged to be handled by the caller
+  const mdl = Math.max(Math.abs(u), Math.abs(v)) || 1;
   return { u: u/mdl, v: v/mdl };
 };
