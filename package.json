@@ -5,9 +5,9 @@
   "main": "build/raster-streamlines.js",
   "jsnext:main": "index",
   "scripts": {
-    "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -n rastertools -o build/raster-streamlines.js -- index.js",
+    "pretest": "rm -rf build && mkdir build && rollup -f umd -n rastertools -o build/raster-streamlines.js -- index.js",
     "test": "tape 'test/*-test.js' && mkdir -p test/output && test/compare-images && eslint index.js src",
-    "posttest": "uglifyjs --preamble \"$(preamble)\" build/raster-streamlines.js -c -m -o build/raster-streamlines.min.js",
+    "posttest": "uglifyjs build/raster-streamlines.js -c -m -o build/raster-streamlines.min.js",
     "prepublish": "npm run test",
     "postpublish": "git push && git push --tags"
   },
@@ -29,17 +29,16 @@
     "url": "git+https://github.com/rveciana/raster-streamlines.git"
   },
   "devDependencies": {
-    "canvas": "^1.6.2",
-    "d3-geo": "^1.4.0",
-    "d3-scale": "^1.0.3",
-    "eslint": "^3.10.0",
-    "geotiff": "^0.3.3",
-    "package-preamble": "0.0.2",
-    "rollup": "^0.36.3",
-    "tape": "^4.6.2",
-    "topojson-server": "^2.0.0",
-    "topojson-simplify": "^2.0.0",
-    "topojson-client": "^2.1.0",
-    "uglify-js": "^2.7.4"
+    "canvas": "^2.6.1",
+    "d3-geo": "^2.0.1",
+    "d3-scale": "^3.2.3",
+    "eslint": "^7.14.0",
+    "geotiff": "^0.4.1",
+    "rollup": "^2.34.0",
+    "tape": "^5.0.1",
+    "topojson-server": "^3.0.1",
+    "topojson-simplify": "^3.0.3",
+    "topojson-client": "^3.1.0",
+    "uglify-js": "^3.12.1"
   }
 }
