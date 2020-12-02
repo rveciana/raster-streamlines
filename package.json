@@ -1,6 +1,6 @@
 {
   "name": "raster-streamlines",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generates stramlines as a GeoJSON from a raster field",
   "main": "build/raster-streamlines.js",
   "jsnext:main": "index",
