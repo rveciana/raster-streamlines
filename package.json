@@ -31,7 +31,7 @@
   "devDependencies": {
     "canvas": "^2.6.1",
     "d3-geo": "^2.0.1",
-    "d3-scale": "^3.2.3",
+    "d3-scale": "^4.0.2",
     "eslint": "^7.14.0",
     "geotiff": "^0.4.1",
     "rollup": "^2.34.0",
